@@ -11,4 +11,4 @@ terraform.tfstate.backup
 terraform.log
 terraform.tfvars
 .terraform-version
-
+*log*
