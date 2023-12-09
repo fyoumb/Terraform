@@ -12,3 +12,4 @@ terraform.log
 terraform.tfvars
 .terraform-version
 *log*
+Ticket*
