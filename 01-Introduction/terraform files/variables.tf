@@ -1,6 +1,6 @@
 variable "aws_region" {
   type    = string
-  default = "us-west-1"
+  default = "us-east-1"
 }
 
 variable "my_instance_type" {
@@ -10,10 +10,12 @@ variable "my_instance_type" {
 
 variable "my_key" {
   type    = string
-  default = "ansible-key"
+  default = "fyoumbis-va-kp"
 }
 
+/*
 variable "os" {
-  type    = string
+  type = string
   #default = "linux"
 }
+*/
