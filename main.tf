@@ -1,14 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
-variable "vpc_cidr_block" {}
-variable "subnet_cidr_block" {}
-variable "avail_zone" {}
-variable "env_prefix" {}
-variable "my_ip" {}
-variable "instance_type" {}
-variable "public_key_location" {}
 
 resource "aws_vpc" "myapp-vpc" {
   cidr_block = var.vpc_cidr_block
@@ -148,19 +137,6 @@ resource "aws_default_security_group" "default-sg" {
   
 }
 
-data "aws_ami" "latest-amazon-linux-image" {
-  most_recent = true
-  owners = ["amazon"]
-  filter {
-    name = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
-  }
-  filter {
-    name = "virtualization-type"
-    values = ["hvm"]
-  }
-}
-
 resource "aws_instance" "myapp-server" {
   ami = data.aws_ami.latest-amazon-linux-image.id
   instance_type = var.instance_type  
@@ -170,6 +146,20 @@ resource "aws_instance" "myapp-server" {
  associate_public_ip_address = true
  # key_name = "fyoumbis-va-kp"
  key_name = aws_key_pair.ssh-key.key_name
+
+ /*
+ user_data = <<EOF
+              #!/bin/bash
+              sudo yum update -y
+              sudo yum install docker -y
+              sudo systemctl start docker
+              sudo usermod -aG docker ec2-user
+              docker run -p 8080:80 nginx
+             EOF
+  */
+
+user_data = file("entry-script.sh")
+
  tags = {
   Name = "${var.env_prefix}-server"
  }
@@ -181,10 +171,3 @@ resource "aws_key_pair" "ssh-key" {
   
 }
  
-output "aws_ami_id" {
-  value = data.aws_ami.latest-amazon-linux-image.id
-}
-
-output "ec2_public_ip" {
-  value = aws_instance.myapp-server.public_ip
-}
