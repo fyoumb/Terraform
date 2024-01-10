@@ -158,8 +158,36 @@ resource "aws_instance" "myapp-server" {
              EOF
   */
 
-user_data = file("entry-script.sh")
+# user_data = file("entry-script.sh")
 
+connection {
+  type = "ssh"
+  host = self.public_ip
+  user = "ec2_user"
+  private_key = file(var.private_key_location)
+}
+
+provisioner "file" {
+  source = "entry-script.sh"
+  destination = "~/entry-script.sh"
+  
+}
+
+provisioner "remote-exec" {
+  
+   script = file("entry-script.sh") # The file must exist on the remote machine
+ /*
+  inline = [
+    "export ENV=dev",
+    "mkdir newdir"
+  ]
+  */
+}
+
+provisioner "local-exec" {
+  command = "echo ${self.public_ip} > output.txt"
+  
+}
  tags = {
   Name = "${var.env_prefix}-server"
  }
